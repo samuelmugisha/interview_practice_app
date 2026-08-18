@@ -233,31 +233,4 @@ The structured-reasoning strategy asks the model to reason internally and return
 a concise final rationale. This demonstrates a reasoning-oriented prompt technique
 without requesting or exposing private hidden reasoning traces.
 
-## Changes made
 
-Starting from the original assignment scaffold (Streamlit UI, OpenRouter
-client, five prompt strategies, Prompt Lab, security guards), the following
-was added:
-
-- **Visual redesign** — gradient header banner, dark-navy sidebar theme,
-  nav-style pill tabs with hover states, card layout for the answer
-  checklist, and the Streamlit "Deploy" toolbar hidden.
-- **Color-coded score badges** — red/yellow/green badges (derived from each
-  `*_SCORE:` field the model returns) replace plain score text throughout
-  the Practice tab, Prompt Lab, and Temperature Lab.
-- **Temperature control** — a sidebar slider wired into every model call,
-  plus a new **Temperature Lab** tab that runs one evaluation at several
-  temperatures side by side to compare the effect.
-- **Reasoning effort control** — a sidebar setting (default Low) that fixed
-  a real bug where gpt-5-family models could exhaust `max_tokens` on hidden
-  reasoning and return an empty response; also surfaced as a tunable model
-  setting.
-- **Live cost estimation** — pricing pulled from OpenRouter's `/models`
-  endpoint and combined with actual token usage to show per-call and
-  running session cost.
-- **Follow-up question loop** — evaluation feedback's `FOLLOW_UP` field can
-  now be answered and evaluated in a repeating thread, with the prompt
-  updated so the model can signal `NONE` when no more probing is needed,
-  plus a 4-round safety cap.
-- **Footer and branding** — replaced the original disclaimer footer with a
-  copyright line, and swapped the header icon from 🧠 to 🎯.
