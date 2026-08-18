@@ -7,6 +7,9 @@ A Streamlit app for practicing AI Solutions Architect interviews using OpenRoute
 ![OpenRouter](https://img.shields.io/badge/OpenRouter-API-6C5CE7?logo=openai&logoColor=white)
 ![GPT-5](https://img.shields.io/badge/Models-GPT--5%20family-412991?logo=openai&logoColor=white)
 ![License](https://img.shields.io/badge/status-demo%2Fassignment-lightgrey)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-DigitalOcean-0080FF?logo=digitalocean&logoColor=white)](https://oyster-app-8ef5k.ondigitalocean.app/)
+
+**🔗 Live app:** [oyster-app-8ef5k.ondigitalocean.app](https://oyster-app-8ef5k.ondigitalocean.app/)
 
 ![App screenshot](assets/app_screenshot.png)
 
@@ -17,14 +20,12 @@ A Streamlit app for practicing AI Solutions Architect interviews using OpenRoute
 - [🔑 1. Create your OpenRouter API key](#-1-create-your-openrouter-api-key)
 - [📦 2. Install](#-2-install)
 - [▶️ 3. Run](#️-3-run)
-- [🌊 Deploying to DigitalOcean](#-deploying-to-digitalocean)
 - [🧪 4. How to evaluate the five prompts](#-4-how-to-evaluate-the-five-prompts)
 - [🌡️ 5. How to tune temperature and reasoning effort](#️-5-how-to-tune-temperature-and-reasoning-effort)
 - [🔁 6. Follow-up questions](#-6-follow-up-questions)
 - [💲 Cost tracking](#-cost-tracking)
 - [🔒 Security design](#-security-design)
 - [💭 Notes on Chain-of-Thought](#-notes-on-chain-of-thought)
-- [📝 Changes made](#-changes-made)
 
 ## ✨ What the app includes
 
@@ -156,102 +157,6 @@ streamlit run app.py
 ```
 
 Then open the local URL Streamlit prints, normally `http://localhost:8501`.
-
-## 🌊 Deploying to DigitalOcean
-
-Two options, from simplest to most control. Either way, keep the API key
-out of Git — `.streamlit/secrets.toml` is already gitignored; deployment
-uses an environment variable instead (`get_api_key` in
-`openrouter_client.py` already falls back to `os.getenv("OPENROUTER_API_KEY")`,
-so no code changes are needed).
-
-### Option A: App Platform (recommended — managed, HTTPS included)
-
-1. **Push to GitHub.** This repo is already at
-   `github.com/samuelmugisha/interview_practice_app` — just make sure your
-   latest commits are pushed (`git push`).
-2. In the DigitalOcean dashboard, go to **Apps → Create App → GitHub**, and
-   authorize/select the `interview_practice_app` repo and branch.
-3. DigitalOcean autodetects Python from `requirements.txt`. Edit the
-   component's settings and set:
-   - **Run Command**:
-     `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true`
-   - **HTTP Port**: matches `$PORT` (App Platform sets this automatically).
-4. Under **App-Level Environment Variables**, add:
-   - `OPENROUTER_API_KEY` = your key, type **Encrypted**.
-5. Pick a plan (the cheapest **Basic** instance is enough for a demo) and
-   click **Create Resources**.
-6. DigitalOcean builds (`pip install -r requirements.txt`) and deploys
-   automatically, giving you a public HTTPS URL like
-   `https://interview-practice-app-xxxxx.ondigitalocean.app`.
-7. Optional: **Settings → Domains** to attach a custom domain, and enable
-   **Autodeploy** so every push to `main` redeploys automatically.
-
-### Option B: Droplet (manual VM — more control, cheaper long-term)
-
-1. **Create a Droplet**: Ubuntu 24.04 LTS, Basic plan (1 GB RAM is enough),
-   add your SSH key.
-2. **SSH in and install dependencies**:
-   ```bash
-   ssh root@<droplet-ip>
-   apt update && apt upgrade -y
-   apt install -y python3-venv python3-pip git nginx certbot python3-certbot-nginx
-   ```
-3. **Clone and set up the app**:
-   ```bash
-   git clone https://github.com/samuelmugisha/interview_practice_app.git /opt/interview-app
-   cd /opt/interview-app
-   python3 -m venv .venv
-   .venv/bin/pip install -r requirements.txt
-   ```
-4. **Store the API key** outside Git:
-   ```bash
-   echo 'OPENROUTER_API_KEY=your_key_here' > /etc/interview-app.env
-   chmod 600 /etc/interview-app.env
-   ```
-5. **Create a systemd service** at `/etc/systemd/system/interview-app.service`:
-   ```ini
-   [Unit]
-   Description=AI Solutions Architect Interview Coach
-   After=network.target
-
-   [Service]
-   WorkingDirectory=/opt/interview-app
-   EnvironmentFile=/etc/interview-app.env
-   ExecStart=/opt/interview-app/.venv/bin/streamlit run app.py --server.port=8501 --server.address=127.0.0.1 --server.headless=true
-   Restart=always
-
-   [Install]
-   WantedBy=multi-user.target
-   ```
-   Then:
-   ```bash
-   systemctl daemon-reload
-   systemctl enable --now interview-app
-   ```
-6. **Reverse-proxy with nginx** (Streamlit needs websocket upgrade headers)
-   — add to `/etc/nginx/sites-available/interview-app` and symlink into
-   `sites-enabled`:
-   ```nginx
-   server {
-       listen 80;
-       server_name your-domain.com;
-
-       location / {
-           proxy_pass http://127.0.0.1:8501;
-           proxy_http_version 1.1;
-           proxy_set_header Upgrade $http_upgrade;
-           proxy_set_header Connection "upgrade";
-           proxy_set_header Host $host;
-       }
-   }
-   ```
-   Then `nginx -t && systemctl reload nginx`.
-7. **Enable HTTPS**: `certbot --nginx -d your-domain.com`.
-8. **Firewall**: `ufw allow OpenSSH && ufw allow 'Nginx Full' && ufw enable`.
-9. **Point DNS**: create an A record for your domain pointing at the
-   droplet's IP.
-10. **To update later**: `cd /opt/interview-app && git pull && .venv/bin/pip install -r requirements.txt && systemctl restart interview-app`.
 
 ## 🧪 4. How to evaluate the five prompts
 
