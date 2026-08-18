@@ -1,8 +1,31 @@
-# AI Solutions Architect Interview Coach
+# 🎯 AI Solutions Architect Interview Coach
 
 A Streamlit app for practicing AI Solutions Architect interviews using OpenRouter.
 
-## What the app includes
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.61-FF4B4B?logo=streamlit&logoColor=white)
+![OpenRouter](https://img.shields.io/badge/OpenRouter-API-6C5CE7?logo=openai&logoColor=white)
+![GPT-5](https://img.shields.io/badge/Models-GPT--5%20family-412991?logo=openai&logoColor=white)
+![License](https://img.shields.io/badge/status-demo%2Fassignment-lightgrey)
+
+![App screenshot](assets/app_screenshot.png)
+
+## 📑 Contents
+
+- [✨ What the app includes](#-what-the-app-includes)
+- [🏗️ Architecture](#️-architecture)
+- [🔑 1. Create your OpenRouter API key](#-1-create-your-openrouter-api-key)
+- [📦 2. Install](#-2-install)
+- [▶️ 3. Run](#️-3-run)
+- [🧪 4. How to evaluate the five prompts](#-4-how-to-evaluate-the-five-prompts)
+- [🌡️ 5. How to tune temperature and reasoning effort](#️-5-how-to-tune-temperature-and-reasoning-effort)
+- [🔁 6. Follow-up questions](#-6-follow-up-questions)
+- [💲 Cost tracking](#-cost-tracking)
+- [🔒 Security design](#-security-design)
+- [💭 Notes on Chain-of-Thought](#-notes-on-chain-of-thought)
+- [📝 Changes made](#-changes-made)
+
+## ✨ What the app includes
 
 - Streamlit front end with a chat/interview-style workflow, custom-themed UI
   (dark sidebar, gradient header banner, card layout, color-coded score badges).
@@ -40,7 +63,7 @@ A Streamlit app for practicing AI Solutions Architect interviews using OpenRoute
   - per-session request rate limiting
 - API key is read server-side and is never entered into a normal chat field.
 
-## Architecture
+## 🏗️ Architecture
 
 ```mermaid
 flowchart TD
@@ -93,7 +116,7 @@ flowchart TD
 - **`.streamlit/secrets.toml`** (or the `OPENROUTER_API_KEY` env var) — the
   only place the API key lives; it never passes through the chat UI.
 
-## 1. Create your OpenRouter API key
+## 🔑 1. Create your OpenRouter API key
 
 Sign in to OpenRouter and create an API key in your OpenRouter account/dashboard.
 
@@ -117,7 +140,7 @@ Or set an environment variable:
 export OPENROUTER_API_KEY="your_key_here"
 ```
 
-## 2. Install
+## 📦 2. Install
 
 ```bash
 python -m venv .venv
@@ -125,7 +148,7 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## 3. Run
+## ▶️ 3. Run
 
 ```bash
 streamlit run app.py
@@ -133,7 +156,7 @@ streamlit run app.py
 
 Then open the local URL Streamlit prints, normally `http://localhost:8501`.
 
-## 4. How to evaluate the five prompts
+## 🧪 4. How to evaluate the five prompts
 
 Use the **Prompt Lab** tab.
 
@@ -156,7 +179,7 @@ A useful evaluation set should include:
 The "best" prompt should be selected based on consistency, usefulness, realism, and
 how much the feedback improves your answers—not only the numeric score.
 
-## 5. How to tune temperature and reasoning effort
+## 🌡️ 5. How to tune temperature and reasoning effort
 
 The sidebar exposes two model settings that apply to every call:
 
@@ -175,7 +198,7 @@ question and answer, pick several temperature values, and run them all
 through the currently selected model/strategy to see the score and wording
 change side by side.
 
-## 6. Follow-up questions
+## 🔁 6. Follow-up questions
 
 After clicking **Evaluate my answer**, if the feedback includes a follow-up
 question, a new card appears where you can answer it. Submitting evaluates
@@ -183,7 +206,7 @@ that answer the same way and, if the model produces another follow-up,
 repeats — up to 4 rounds — until it responds that no further probing is
 needed.
 
-## Cost tracking
+## 💲 Cost tracking
 
 Every model call's cost is estimated from OpenRouter's live per-token
 pricing (`GET /api/v1/models`) and the actual `prompt_tokens` /
@@ -194,7 +217,7 @@ pricing (`GET /api/v1/models`) and the actual `prompt_tokens` /
 
 Pricing is cached for an hour per model to avoid refetching on every call.
 
-## Security design
+## 🔒 Security design
 
 The app intentionally includes an application-layer security module. It blocks common
 attempts to reveal system prompts or credentials, detects likely pasted API/private
@@ -204,9 +227,37 @@ These are basic guards for an assignment/demo. A production deployment should al
 authentication, server-side quotas, provider spend limits, logging/monitoring, secure
 secret storage, dependency scanning, and stronger content-abuse controls.
 
-## Notes on Chain-of-Thought
+## 💭 Notes on Chain-of-Thought
 
 The structured-reasoning strategy asks the model to reason internally and return only
 a concise final rationale. This demonstrates a reasoning-oriented prompt technique
 without requesting or exposing private hidden reasoning traces.
 
+## Changes made
+
+Starting from the original assignment scaffold (Streamlit UI, OpenRouter
+client, five prompt strategies, Prompt Lab, security guards), the following
+was added:
+
+- **Visual redesign** — gradient header banner, dark-navy sidebar theme,
+  nav-style pill tabs with hover states, card layout for the answer
+  checklist, and the Streamlit "Deploy" toolbar hidden.
+- **Color-coded score badges** — red/yellow/green badges (derived from each
+  `*_SCORE:` field the model returns) replace plain score text throughout
+  the Practice tab, Prompt Lab, and Temperature Lab.
+- **Temperature control** — a sidebar slider wired into every model call,
+  plus a new **Temperature Lab** tab that runs one evaluation at several
+  temperatures side by side to compare the effect.
+- **Reasoning effort control** — a sidebar setting (default Low) that fixed
+  a real bug where gpt-5-family models could exhaust `max_tokens` on hidden
+  reasoning and return an empty response; also surfaced as a tunable model
+  setting.
+- **Live cost estimation** — pricing pulled from OpenRouter's `/models`
+  endpoint and combined with actual token usage to show per-call and
+  running session cost.
+- **Follow-up question loop** — evaluation feedback's `FOLLOW_UP` field can
+  now be answered and evaluated in a repeating thread, with the prompt
+  updated so the model can signal `NONE` when no more probing is needed,
+  plus a 4-round safety cap.
+- **Footer and branding** — replaced the original disclaimer footer with a
+  copyright line, and swapped the header icon from 🧠 to 🎯.
