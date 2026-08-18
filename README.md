@@ -17,6 +17,7 @@ A Streamlit app for practicing AI Solutions Architect interviews using OpenRoute
 - [🔑 1. Create your OpenRouter API key](#-1-create-your-openrouter-api-key)
 - [📦 2. Install](#-2-install)
 - [▶️ 3. Run](#️-3-run)
+- [🌊 Deploying to DigitalOcean](#-deploying-to-digitalocean)
 - [🧪 4. How to evaluate the five prompts](#-4-how-to-evaluate-the-five-prompts)
 - [🌡️ 5. How to tune temperature and reasoning effort](#️-5-how-to-tune-temperature-and-reasoning-effort)
 - [🔁 6. Follow-up questions](#-6-follow-up-questions)
